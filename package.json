@@ -1,0 +1,17 @@
+{
+  "name": "node_api",
+  "version": "1.0.0",
+  "description": "Devcamper API",
+  "main": "server.js",
+  "scripts": {
+    "start":"set NODE_ENV=production && node server",
+    "dev":"nodemon server"
+  },
+  "repository": "git@github.com:Ivan-Mitkov/node_api.git",
+  "author": "Ivan Mitkov <ivan.mitkov@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1"
+  }
+}
