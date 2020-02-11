@@ -2,6 +2,10 @@ const express = require("express");
 const router = express.Router();
 
 const bootcampController = require("../controllers/bootcapms.js");
+
+router
+  .route("/radius/:zipcode/:distance")
+  .get(bootcampController.getBootcampsInRadius);
 router
   .route("/")
   .get(bootcampController.getBootcamps)
