@@ -21,7 +21,7 @@ const CourseSchema = new mongoose.Schema({
   minimumSkill: {
     type: String,
     required: [true, "Please add a minimum skills"],
-    enum: ["beginer", "intermediate", "advance"]
+    enum: ["beginner", "intermediate", "advance"]
   },
   scholarshipsAvailable:{
       type:Boolean,
