@@ -5,6 +5,7 @@ const router = express.Router({mergeParams:true});
 const coursesController = require("../controllers/courses.js");
 
 router.route("/").get(coursesController.getCourses);
+router.route("/:id").get(coursesController.getCourse);
 
 
 module.exports = router;
