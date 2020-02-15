@@ -3,6 +3,8 @@ const router = express.Router();
 
 const bootcampController = require("../controllers/bootcapms.js");
 
+const advancedResults = require("../middleware/advancedResults");
+const Bootcamp = require("../models/Bootcamp");
 //include other resource routers
 const courseRouter = require("./courses.js");
 
@@ -16,7 +18,8 @@ router
 router.route("/:id/photo").put(bootcampController.bootcampPhotoUpload);
 router
   .route("/")
-  .get(bootcampController.getBootcamps)
+  //pass middleware for advance results, sorting limit pagination thi stuff
+  .get(advancedResults(Bootcamp, "courses"), bootcampController.getBootcamps)
   .post(bootcampController.createBootcamp);
 router
   .route("/:id")
