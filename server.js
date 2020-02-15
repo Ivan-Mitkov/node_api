@@ -1,11 +1,11 @@
 const express = require("express");
-const path=require('path')
+const path = require("path");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
-const fileUpload=require('express-fileupload')
+const fileUpload = require("express-fileupload");
 const colors = require("colors");
 const connectDB = require("./config/db.js");
-const errorHandler=require('./middleware/error.js');
+const errorHandler = require("./middleware/error.js");
 //Load env vars
 dotenv.config({ path: "./config/config.env" });
 //Connect to the DB
@@ -14,32 +14,35 @@ connectDB();
 //Route files
 const bootcamps = require("./routes/bootcamps");
 const courses = require("./routes/courses");
+const auth = require("./routes/auth.js");
 
 const app = express();
 //Body parser
-app.use(express.json())
+app.use(express.json());
 
 //Dev loggin middleware
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
-//File upload 
-app.use(fileUpload({}));//Mount routers
+//File upload
+app.use(fileUpload({})); //Mount routers
 
 //Set public folder as static folder
-app.use(express.static(path.join(__dirname,'public')))
+app.use(express.static(path.join(__dirname, "public")));
 
 //Mount routes
 app.use("/api/v1/bootcamps", bootcamps);
 app.use("/api/v1/courses", courses);
+app.use("/api/v1/auth", auth);
 
-//error handler 
-app.use(errorHandler)
-
+//error handler
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, () =>
-  console.log(`Server running in ${process.env.NODE_ENV} on port ${PORT}`.yellow.bold)
+  console.log(
+    `Server running in ${process.env.NODE_ENV} on port ${PORT}`.yellow.bold
+  )
 );
 
 //Handle unhandled promise rejection
