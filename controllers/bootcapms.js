@@ -1,3 +1,4 @@
+const path = require("path");
 const Bootcamp = require("../models/Bootcamp");
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middleware/async.js");
@@ -24,7 +25,7 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
   queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
 
   //create JSON object from query string and pass it to query
-  query = Bootcamp.find(JSON.parse(queryStr)).populate('courses');
+  query = Bootcamp.find(JSON.parse(queryStr)).populate("courses");
 
   //SELECT fields
   //https://mongoosejs.com/docs/queries.html
@@ -75,14 +76,12 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
     };
   }
 
-  res
-    .status(200)
-    .json({
-      success: true,
-      data: bootcamps,
-      pagination,
-      count: bootcamps.length
-    });
+  res.status(200).json({
+    success: true,
+    data: bootcamps,
+    pagination,
+    count: bootcamps.length
+  });
 });
 
 //@desk Get single bootcamp
@@ -142,7 +141,7 @@ exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
     );
   }
   //for cascade delete need to use remove
-  bootCamp.remove()
+  bootCamp.remove();
   res.status(200).json({
     success: true,
     data: {}
@@ -172,4 +171,62 @@ exports.getBootcampsInRadius = asyncHandler(async (req, res, next) => {
   res
     .status(200)
     .json({ success: true, count: bootcamps.length, data: bootcamps });
+});
+
+//@desk Upload Photo
+//@route PUT /api/v1/bootcamps/:id/photo
+//@access Private
+exports.bootcampPhotoUpload = asyncHandler(async (req, res, next) => {
+  const bootCamp = await Bootcamp.findById(req.params.id);
+  if (!bootCamp) {
+    return next(
+      new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404)
+    );
+  }
+  if (!req.files) {
+    return next(new ErrorResponse(`Please upload a file`, 404));
+  }
+
+  // console.log(req.files.file);
+  const file = req.files.file;
+
+  //Validation
+  //Make shure that the image is a photo
+  if (!file.mimetype.startsWith("image")) {
+    return next(new ErrorResponse(`Please upload an image file`, 404));
+  }
+  //check file size
+  if (file.size > process.env.MAX_FILE_UPLOAD) {
+    return next(
+      new ErrorResponse(
+        `Please upload an image less then ${Math.ceil(
+          process.env.MAX_FILE_UPLOAD / 1024
+        )} KB`,
+        404
+      )
+    );
+  }
+
+  //create custom filename, duplicate file name will overwrite the present file
+  //using path module for file extension
+  // file.name = `photo_${bootCamp._id}${path.parse(file.name).ext}`;
+
+  //get extension from mimetipe NOT from file extension
+  //BETTER
+   const extension = file.mimetype.split("/")[1];
+   const filename = file.name.split(".")[0];
+   file.name=`photo_${filename}_${bootCamp._id}.${extension}`;
+
+  console.log(file);
+  file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async err => {
+    if (err) {
+      console.log(err);
+      return next(new ErrorResponse(`Problem with file upload`, 500));
+    }
+    await Bootcamp.findByIdAndUpdate(req.params.id, { photo: file.name });
+    res.status(200).json({
+      success: true,
+      data: file.name
+    });
+  });
 });
