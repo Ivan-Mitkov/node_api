@@ -3,10 +3,18 @@ const express = require("express");
 const router = express.Router({ mergeParams: true });
 
 const coursesController = require("../controllers/courses.js");
+const Courses = require("../models/Course");
+const advancedResults = require("../middleware/advancedResults");
 
 router
   .route("/")
-  .get(coursesController.getCourses)
+  .get(
+    advancedResults(Courses, {
+      path: "bootcamp",
+      select: "name description"
+    }),
+    coursesController.getCourses
+  )
   .post(coursesController.addCourse);
 router
   .route("/:id")
