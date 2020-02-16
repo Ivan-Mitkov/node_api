@@ -7,7 +7,7 @@ const advancedResults = require("../middleware/advancedResults");
 const Bootcamp = require("../models/Bootcamp");
 //include other resource routers
 const courseRouter = require("./courses.js");
-const { protect } = require("../middleware/auth");
+const { protect, authorize } = require("../middleware/auth");
 //Re-route into other resource - pass this route
 router.use("/:bootcampId/courses", courseRouter);
 
@@ -15,16 +15,34 @@ router.use("/:bootcampId/courses", courseRouter);
 router
   .route("/radius/:zipcode/:distance")
   .get(bootcampController.getBootcampsInRadius);
-router.route("/:id/photo").put(protect, bootcampController.bootcampPhotoUpload);
+router
+  .route("/:id/photo")
+  .put(
+    protect,
+    authorize("publisher", "admin"),
+    bootcampController.bootcampPhotoUpload
+  );
 router
   .route("/")
   //pass middleware for advance results, sorting limit pagination thi stuff
   .get(advancedResults(Bootcamp, "courses"), bootcampController.getBootcamps)
-  .post(protect, bootcampController.createBootcamp);
+  .post(
+    protect,
+    authorize("publisher", "admin"),
+    bootcampController.createBootcamp
+  );
 router
   .route("/:id")
   .get(bootcampController.getBootcamp)
-  .put(protect, bootcampController.updateBootcamp)
-  .delete(protect, bootcampController.deleteBootcamp);
+  .put(
+    protect,
+    authorize("publisher", "admin"),
+    bootcampController.updateBootcamp
+  )
+  .delete(
+    protect,
+    authorize("publisher", "admin"),
+    bootcampController.deleteBootcamp
+  );
 
 module.exports = router;

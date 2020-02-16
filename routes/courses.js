@@ -1,7 +1,7 @@
 const express = require("express");
 //mergeParams:true passed from other routes routes
 const router = express.Router({ mergeParams: true });
-const { protect } = require("../middleware/auth");
+const { protect, authorize } = require("../middleware/auth");
 
 const coursesController = require("../controllers/courses.js");
 const Courses = require("../models/Course");
@@ -16,11 +16,15 @@ router
     }),
     coursesController.getCourses
   )
-  .post(protect, coursesController.addCourse);
+  .post(protect, authorize("publisher", "admin"), coursesController.addCourse);
 router
   .route("/:id")
   .get(coursesController.getCourse)
-  .put(protect, coursesController.updateCourse)
-  .delete(protect, coursesController.deleteCourse);
+  .put(protect, authorize("publisher", "admin"), coursesController.updateCourse)
+  .delete(
+    protect,
+    authorize("publisher", "admin"),
+    coursesController.deleteCourse
+  );
 
 module.exports = router;
