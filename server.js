@@ -25,7 +25,7 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 //File upload
-app.use(fileUpload({})); //Mount routers
+app.use(fileUpload({})); 
 
 //Set public folder as static folder
 app.use(express.static(path.join(__dirname, "public")));
