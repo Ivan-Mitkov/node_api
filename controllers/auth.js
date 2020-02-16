@@ -15,6 +15,10 @@ exports.register = asyncHandler(async (req, res, next) => {
     password,
     role
   });
+  //Create JW token
+  //lower case user user becuase we are using methods not statics
+  const token = user.getSignedJWTToken();
+
   //paswword encryption in model
-  res.status(200).json({ success: true });
+  res.status(200).json({ success: true,token });
 });
