@@ -15,12 +15,7 @@ exports.register = asyncHandler(async (req, res, next) => {
     password,
     role
   });
-  //Create JW token
-  //lower case user user becuase we are using methods not statics
-  const token = user.getSignedJWTToken();
-
-  //paswword encryption in model
-  res.status(200).json({ success: true, token });
+  sentTokenResponse(user, 200, res);
 });
 
 //@desk Login User
@@ -49,10 +44,30 @@ exports.login = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse("Invalid credentials", 401));
   }
 
+  sentTokenResponse(user, 200, res);
+});
+
+//Get token from model, create cookie, send response
+const sentTokenResponse = (user, statusCode, res) => {
   //Create JW token
   //lower case user user becuase we are using methods not statics
   const token = user.getSignedJWTToken();
+  const options = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true
+  };
 
-  //paswword encryption in model
-  res.status(200).json({ success: true, token });
-});
+  if(process.env.NODE_ENV==='production'){
+    options.secure=true
+  }
+
+  res
+    .status(statusCode)
+    .cookie("token", token, options)
+    .json({ success: true, token });
+};
+// HttpOnly cookies are inaccessible to JavaScript's Document.cookie API;
+// they are only sent to the server. For example, cookies that persist server-side sessions
+// don't need to be available to JavaScript, and the HttpOnly flag should be set.

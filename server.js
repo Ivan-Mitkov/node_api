@@ -3,6 +3,7 @@ const path = require("path");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
 const fileUpload = require("express-fileupload");
+const cookieParser = require("cookie-parser");
 const colors = require("colors");
 const connectDB = require("./config/db.js");
 const errorHandler = require("./middleware/error.js");
@@ -19,13 +20,15 @@ const auth = require("./routes/auth.js");
 const app = express();
 //Body parser
 app.use(express.json());
+//Cookie parser
+app.use(cookieParser());
 
 //Dev loggin middleware
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 //File upload
-app.use(fileUpload({})); 
+app.use(fileUpload({}));
 
 //Set public folder as static folder
 app.use(express.static(path.join(__dirname, "public")));
