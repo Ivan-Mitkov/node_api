@@ -8,8 +8,6 @@ const geocoder = require("../utils/geocoder");
 //@route GET /api/v1/bootcamps
 //@access Public
 exports.getBootcamps = asyncHandler(async (req, res, next) => {
- 
-
   res.status(200).json(res.advancedResults);
 });
 
@@ -32,6 +30,22 @@ exports.getBootcamp = asyncHandler(async (req, res, next) => {
 //@route POST /api/v1/bootcamps
 //@access Private
 exports.createBootcamp = asyncHandler(async (req, res, next) => {
+  //Add user to req.card-body
+  req.body.user = req.user.id;
+
+  //Check for published bootcamps
+  const publishedBootcamp = await Bootcamp.findOne({ user: req.user });
+
+  //If the user is not an admin, they can only add one bootcamp
+  if (publishedBootcamp && req.user.role !== "admin") {
+    return next(
+      new ErrorResponse(
+        `The user with ID ${req.user.id} has already publish a bootcamp `,
+        404
+      )
+    );
+  }
+
   const bootCamp = await Bootcamp.create(req.body);
   res.status(201).json({
     success: true,
@@ -142,9 +156,9 @@ exports.bootcampPhotoUpload = asyncHandler(async (req, res, next) => {
 
   //get extension from mimetipe NOT from file extension
   //BETTER
-   const extension = file.mimetype.split("/")[1];
-   const filename = file.name.split(".")[0];
-   file.name=`photo_${filename}_${bootCamp._id}.${extension}`;
+  const extension = file.mimetype.split("/")[1];
+  const filename = file.name.split(".")[0];
+  file.name = `photo_${filename}_${bootCamp._id}.${extension}`;
 
   console.log(file);
   file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async err => {
