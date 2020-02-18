@@ -48,6 +48,8 @@ exports.login = asyncHandler(async (req, res, next) => {
 
   sentTokenResponse(user, 200, res);
 });
+
+
 //@desk Get current Logged in User
 //@route GET /api/v1/auth/me
 //@access Private
@@ -55,6 +57,8 @@ exports.getMe = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
   res.status(200).json({ success: true, data: user });
 });
+
+
 //@desk Update user detail
 //@route PUR /api/v1/auth/updatedetails
 //@access Private
@@ -69,6 +73,24 @@ exports.updateDetails = asyncHandler(async (req, res, next) => {
     runValidators: true
   });
   res.status(200).json({ success: true, data: user });
+});
+
+//@desk Update password
+//@route PUT /api/v1/auth/updatepassword
+//@access Private
+exports.updatePassword = asyncHandler(async (req, res, next) => {
+  //password by default is select:false
+  const user = await User.findById(req.user.id).select("+password");
+
+  //Check current password
+  if(!(await user.matchPassword(req.body.currentPassword))){
+    return next(new ErrorResponse("Password is incorect", 401));
+  }
+
+  user.password=req.body.newPassword;
+
+  await user.save()
+  sentTokenResponse(user, 200, res);
 });
 
 //@desk Forgot password
