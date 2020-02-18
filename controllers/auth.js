@@ -55,6 +55,21 @@ exports.getMe = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
   res.status(200).json({ success: true, data: user });
 });
+//@desk Update user detail
+//@route PUR /api/v1/auth/updatedetails
+//@access Private
+exports.updateDetails = asyncHandler(async (req, res, next) => {
+  //passing only email and name
+  const fieldsToUpdate = {
+    name: req.body.name,
+    email: req.body.email
+  };
+  const user = await User.findByIdAndUpdate(req.user.id, fieldsToUpdate, {
+    new: true,
+    runValidators: true
+  });
+  res.status(200).json({ success: true, data: user });
+});
 
 //@desk Forgot password
 //@route POST /api/v1/auth/forgotpassword
