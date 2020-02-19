@@ -5,11 +5,16 @@ const bootcampController = require("../controllers/bootcapms.js");
 
 const advancedResults = require("../middleware/advancedResults");
 const Bootcamp = require("../models/Bootcamp");
+
 //include other resource routers
+//mergeParams:true passed from other routes routes
 const courseRouter = require("./courses.js");
+const reviewRouter = require("./reviews");
+
 const { protect, authorize } = require("../middleware/auth");
 //Re-route into other resource - pass this route
 router.use("/:bootcampId/courses", courseRouter);
+router.use("/:bootcampId/reviews", reviewRouter);
 
 //bootcamp
 router
