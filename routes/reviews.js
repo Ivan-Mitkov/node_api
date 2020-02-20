@@ -8,13 +8,16 @@ const reviewsController = require("../controllers/reviews");
 const Review = require("../models/Review");
 const advancedResults = require("../middleware/advancedResults");
 
-router.route("/").get(
-  advancedResults(Review, {
-    path: "bootcamp",
-    select: "name description"
-  }),
-  reviewsController.getReviews
-);
+router
+  .route("/")
+  .get(
+    advancedResults(Review, {
+      path: "bootcamp",
+      select: "name description"
+    }),
+    reviewsController.getReviews
+  )
+  .post(protect, authorize("user", "admin"), reviewsController.addReview);
 
 router.route("/:id").get(reviewsController.getReview);
 module.exports = router;
