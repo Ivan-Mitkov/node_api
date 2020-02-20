@@ -16,4 +16,5 @@ router.route("/").get(
   reviewsController.getReviews
 );
 
+router.route("/:id").get(reviewsController.getReview);
 module.exports = router;
