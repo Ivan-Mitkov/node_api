@@ -19,5 +19,9 @@ router
   )
   .post(protect, authorize("user", "admin"), reviewsController.addReview);
 
-router.route("/:id").get(reviewsController.getReview);
+router
+  .route("/:id")
+  .get(reviewsController.getReview)
+  .put(protect, authorize("user", "admin"), reviewsController.updateReview)
+  .delete(protect, authorize("user", "admin"), reviewsController.deleteReview);
 module.exports = router;
