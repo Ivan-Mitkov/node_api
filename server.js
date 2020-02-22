@@ -4,7 +4,9 @@ const dotenv = require("dotenv");
 const morgan = require("morgan");
 const fileUpload = require("express-fileupload");
 const cookieParser = require("cookie-parser");
-const mongoSanitize = require('express-mongo-sanitize');
+const mongoSanitize = require("express-mongo-sanitize");
+const helmet = require("helmet");
+const xss = require("xss-clean");
 
 const colors = require("colors");
 const connectDB = require("./config/db.js");
@@ -33,10 +35,18 @@ if (process.env.NODE_ENV === "development") {
 }
 //File upload
 app.use(fileUpload({}));
+//SECURITY
+/* make sure this comes before any routes */
+
 //prevent noSql injection sanitize data
 // To remove data, use:
 app.use(mongoSanitize());
- 
+//set security headers
+app.use(helmet());
+//Prevent XSS atacks
+app.use(xss());
+
+/* SECURITY before any routes */
 
 //Set public folder as static folder
 app.use(express.static(path.join(__dirname, "public")));
