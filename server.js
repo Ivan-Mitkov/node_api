@@ -7,6 +7,8 @@ const cookieParser = require("cookie-parser");
 const mongoSanitize = require("express-mongo-sanitize");
 const helmet = require("helmet");
 const xss = require("xss-clean");
+const rateLimit = require("express-rate-limit");
+const hpp = require("hpp");
 
 const colors = require("colors");
 const connectDB = require("./config/db.js");
@@ -45,6 +47,15 @@ app.use(mongoSanitize());
 app.use(helmet());
 //Prevent XSS atacks
 app.use(xss());
+//Rate limiting
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 100 // limit each IP to 100 requests per windowMs
+});
+//  apply to all requests
+app.use(limiter);
+//Prevent http param pollution
+app.use(hpp());
 
 /* SECURITY before any routes */
 
