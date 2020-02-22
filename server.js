@@ -9,6 +9,7 @@ const helmet = require("helmet");
 const xss = require("xss-clean");
 const rateLimit = require("express-rate-limit");
 const hpp = require("hpp");
+const cors = require("cors");
 
 const colors = require("colors");
 const connectDB = require("./config/db.js");
@@ -56,7 +57,8 @@ const limiter = rateLimit({
 app.use(limiter);
 //Prevent http param pollution
 app.use(hpp());
-
+//Simple Usage (Enable All CORS Requests)
+app.use(cors());
 /* SECURITY before any routes */
 
 //Set public folder as static folder
