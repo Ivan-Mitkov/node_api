@@ -49,7 +49,6 @@ exports.login = asyncHandler(async (req, res, next) => {
   sentTokenResponse(user, 200, res);
 });
 
-
 //@desk Get current Logged in User
 //@route GET /api/v1/auth/me
 //@access Private
@@ -57,7 +56,17 @@ exports.getMe = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
   res.status(200).json({ success: true, data: user });
 });
-
+//@desk Log user out
+//@route GET /api/v1/auth/logout
+//@access Private
+exports.logout = asyncHandler(async (req, res, next) => {
+  //from cookie parser
+  res.cookie("token", "none", {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true
+  });
+  res.status(200).json({ success: true, data: {} });
+});
 
 //@desk Update user detail
 //@route PUR /api/v1/auth/updatedetails
@@ -83,13 +92,13 @@ exports.updatePassword = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id).select("+password");
 
   //Check current password
-  if(!(await user.matchPassword(req.body.currentPassword))){
+  if (!(await user.matchPassword(req.body.currentPassword))) {
     return next(new ErrorResponse("Password is incorect", 401));
   }
 
-  user.password=req.body.newPassword;
+  user.password = req.body.newPassword;
 
-  await user.save()
+  await user.save();
   sentTokenResponse(user, 200, res);
 });
 
